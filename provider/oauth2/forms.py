@@ -4,7 +4,7 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
 from provider import scope
-from provider.constants import RESPONSE_TYPE_CHOICES, SCOPES
+from provider import constants
 from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.models import Client, Grant, RefreshToken
 from provider.scope import SCOPE_NAMES
@@ -99,7 +99,7 @@ class ScopeMixin(object):
         defined scope in :attr:`provider.constants.SCOPES`.
 
         """
-        default = SCOPES[0][0]
+        default = constants.SCOPES[0][0]
 
         flags = self.cleaned_data.get('scope', [])
 
@@ -151,7 +151,7 @@ class AuthorizationRequestForm(ScopeMixin, OAuthForm):
         types = response_type.split(" ")
 
         for type in types:
-            if type not in RESPONSE_TYPE_CHOICES:
+            if type not in constants.RESPONSE_TYPE_CHOICES:
                 raise OAuthValidationError({
                     'error': 'unsupported_response_type',
                     'error_description': u"'%s' is not a supported response "
