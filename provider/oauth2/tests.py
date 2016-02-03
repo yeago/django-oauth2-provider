@@ -238,10 +238,11 @@ class AuthorizationTest(BaseOAuth2TestCase):
     def test_authorization_requires_a_valid_redirect_uri(self, response_type):
         self.login()
 
+        redirect_uris = self.get_client().redirect_uris
         self.client.get(
             self.auth_url(),
             data=self.get_auth_params(
-                response_type=response_type, redirect_uri=self.get_client().redirect_uri + '-invalid'
+                response_type=response_type, redirect_uri=redirect_uris[0] + '-invalid'
             )
         )
         response = self.client.get(self.auth_url2())
@@ -250,7 +251,7 @@ class AuthorizationTest(BaseOAuth2TestCase):
         self.assertTrue(escape(u"The requested redirect didn't match the client settings.") in response.content)
 
         self.client.get(self.auth_url(), data=self.get_auth_params(
-            response_type=response_type, redirect_uri=self.get_client().redirect_uri))
+            response_type=response_type, redirect_uri=redirect_uris[0]))
         response = self.client.get(self.auth_url2())
 
         self.assertEqual(200, response.status_code)
@@ -800,7 +801,7 @@ class AccessTokenDetailViewTests(TestCase):
         """ If the token is valid, details about the token should be returned. """
 
         access_token = AccessToken.objects.create(user=self.user, client=self.oauth_client, scope=constants.READ,
-                                                  expires=datetime.datetime(2016, 1, 1, 0, 0, 0))
+                                                  expires=datetime.datetime(2030, 1, 1, 0, 0, 0))
 
         url = reverse('oauth2:access_token_detail', kwargs={'token': access_token.token})
 
@@ -811,6 +812,6 @@ class AccessTokenDetailViewTests(TestCase):
         expected = {
             'username': self.user.username,
             'scope': 'read',
-            'expires': '2016-01-01T00:00:00'
+            'expires': '2030-01-01T00:00:00'
         }
         self.assertEqual(response.content, json.dumps(expected))
